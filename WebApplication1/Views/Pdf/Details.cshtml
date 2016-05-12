@@ -1,0 +1,50 @@
+﻿@model WebApplication1.Models.pdf_tbl
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>pdf_tbl</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.authFirstName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.authFirstName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.authLastName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.authLastName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.bookTitle)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.bookTitle)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.bookPrologue)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.bookPrologue)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.bookId }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>
