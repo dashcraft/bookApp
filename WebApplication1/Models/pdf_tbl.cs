@@ -11,14 +11,19 @@ namespace WebApplication1.Models
 {
     using System;
     using System.Collections.Generic;
-    
+    using System.ComponentModel;
     public partial class pdf_tbl
     {
         public int bookId { get; set; }
+        [DisplayName("First Name")]
         public string authFirstName { get; set; }
+        [DisplayName("Last Name")]
         public string authLastName { get; set; }
+        [DisplayName("Title")]
         public string bookTitle { get; set; }
+        [DisplayName("Prologue")]
         public string bookPrologue { get; set; }
+        [DisplayName("User Name")]
         public string userName { get; set; }
     }
 }

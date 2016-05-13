@@ -9,6 +9,10 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using WebApplication1.Models;
+using System.IO;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
+using WebApplication1.Local_Classes;
 
 namespace WebApplication1.Controllers
 {
@@ -49,6 +53,7 @@ namespace WebApplication1.Controllers
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
+        [MultipleButton(Name="action", Argument="Create")]
         [ValidateAntiForgeryToken]
         public ActionResult Create([Bind(Include = "bookId,authFirstName,authLastName,bookTitle,bookPrologue,userName")] pdf_tbl pdf_tbl)
         {
@@ -58,10 +63,53 @@ namespace WebApplication1.Controllers
                 pdf_tbl.userName = System.Web.HttpContext.Current.User.Identity.Name;
                 db.pdf_tbl.Add(pdf_tbl);
                 db.SaveChanges();
+                
                 return RedirectToAction("Index");
             }
-
+            
             return View(pdf_tbl);
+        }
+
+
+
+
+        [HttpPost]
+        [MultipleButton(Name = "action", Argument = "Preview")]
+        [ValidateAntiForgeryToken]
+        public ActionResult Preview([Bind(Include = "bookId,authFirstName,authLastName,bookTitle,bookPrologue,userName")] pdf_tbl pdf_tbl)
+        {
+
+            if (ModelState.IsValid)
+            {
+                pdf_tbl.userName = System.Web.HttpContext.Current.User.Identity.Name;
+                db.pdf_tbl.Add(pdf_tbl);
+                
+                using (var ms = new MemoryStream())
+                {
+                    using (var document = new Document(PageSize.A4, 50, 50, 15, 15))
+                    {
+                        PdfWriter.GetInstance(document, ms);
+                        document.Open();
+                        document.Add(new Paragraph(pdf_tbl.bookPrologue));
+                        document.Close();
+
+                    }
+                    Response.Clear();
+                    //Response.ContentType = "application/pdf";
+                    Response.ContentType = "application/octet-stream";
+                    Response.AddHeader("content-disposition", "attachment;filename= Test.pdf");
+                    Response.Buffer = true;
+                    Response.Clear();
+                    var bytes = ms.ToArray();
+                    Response.OutputStream.Write(bytes, 0, bytes.Length);
+                    ModelState.Clear();
+                    Response.OutputStream.Flush();
+
+
+                }
+                
+            }
+            return View();
         }
 
         // GET: Pdf/Edit/5
@@ -71,6 +119,7 @@ namespace WebApplication1.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
+
             pdf_tbl pdf_tbl = db.pdf_tbl.Find(id);
             if (pdf_tbl == null)
             {
@@ -83,17 +132,62 @@ namespace WebApplication1.Controllers
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
+        [MultipleButton(Name = "action", Argument = "Edit")]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "bookId,authFirstName,authLastName,bookTitle,bookPrologue")] pdf_tbl pdf_tbl)
+        public ActionResult Edit([Bind(Include = "bookId,authFirstName,authLastName,bookTitle,bookPrologue,userName")] pdf_tbl pdf_tbl)
         {
             if (ModelState.IsValid)
             {
+                pdf_tbl.userName = System.Web.HttpContext.Current.User.Identity.Name;
                 db.Entry(pdf_tbl).State = EntityState.Modified;
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
             return View(pdf_tbl);
         }
+
+
+
+        [HttpPost]
+        [MultipleButton(Name = "action", Argument = "editPreview")]
+        [ValidateAntiForgeryToken]
+        public ActionResult editPreview([Bind(Include = "bookId,authFirstName,authLastName,bookTitle,bookPrologue,userName")] pdf_tbl pdf_tbl)
+        {
+
+            if (ModelState.IsValid)
+            {
+                pdf_tbl.userName = System.Web.HttpContext.Current.User.Identity.Name;
+                db.pdf_tbl.Add(pdf_tbl);
+
+                using (var ms = new MemoryStream())
+                {
+                    using (var document = new Document(PageSize.A4, 50, 50, 15, 15))
+                    {
+                        PdfWriter.GetInstance(document, ms);
+                        document.Open();
+                        document.Add(new Paragraph(pdf_tbl.bookPrologue));
+                        document.Close();
+
+                    }
+                    Response.Clear();
+                    //Response.ContentType = "application/pdf";
+                    Response.ContentType = "application/octet-stream";
+                    Response.AddHeader("content-disposition", "attachment;filename= Test.pdf");
+                    Response.Buffer = true;
+                    Response.Clear();
+                    var bytes = ms.ToArray();
+                    Response.OutputStream.Write(bytes, 0, bytes.Length);
+                    ModelState.Clear();
+                    Response.OutputStream.Flush();
+
+
+                }
+
+            }
+            return View();
+        }
+
+
 
         // GET: Pdf/Delete/5
         public ActionResult Delete(int? id)
