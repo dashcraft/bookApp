@@ -14,6 +14,7 @@ using iTextSharp.text;
 using iTextSharp.text.pdf;
 using WebApplication1.Local_Classes;
 
+
 namespace WebApplication1.Controllers
 {
     [Authorize]
@@ -89,7 +90,13 @@ namespace WebApplication1.Controllers
                     using (var document = new Document(PageSize.A4, 50, 50, 15, 15))
                     {
                         PdfWriter.GetInstance(document, ms);
+                        Font titleFont = FontFactory.GetFont("Arial", 40);
+                        Paragraph title;
+                        title = new Paragraph(pdf_tbl.bookTitle, titleFont);
+                        title.Alignment = Element.ALIGN_CENTER;
+                        title.SpacingAfter = 20;
                         document.Open();
+                        document.Add(title);
                         document.Add(new Paragraph(pdf_tbl.bookPrologue));
                         document.Close();
 
@@ -97,7 +104,7 @@ namespace WebApplication1.Controllers
                     Response.Clear();
                     //Response.ContentType = "application/pdf";
                     Response.ContentType = "application/octet-stream";
-                    Response.AddHeader("content-disposition", "attachment;filename= Test.pdf");
+                    Response.AddHeader("content-disposition", "attachment;filename=" + pdf_tbl.bookTitle + ".pdf");
                     Response.Buffer = true;
                     Response.Clear();
                     var bytes = ms.ToArray();
@@ -147,6 +154,56 @@ namespace WebApplication1.Controllers
         }
 
 
+        [HttpGet]
+        public ActionResult editPreview(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+
+            pdf_tbl pdf_tbl = db.pdf_tbl.Find(id);
+            if (pdf_tbl == null)
+            {
+                return HttpNotFound();
+            }
+            
+
+                using (var ms = new MemoryStream())
+                {
+                    using (var document = new Document(PageSize.A4, 50, 50, 15, 15))
+                    {
+                        PdfWriter.GetInstance(document, ms);
+                        Font titleFont = FontFactory.GetFont("Arial", 40);
+                        Paragraph title;
+                        title = new Paragraph(pdf_tbl.bookTitle, titleFont);
+                    title.Alignment = Element.ALIGN_CENTER;
+                    title.SpacingAfter = 20;
+                        document.Open();
+                        document.Add(title);
+                        document.Add(new Paragraph(pdf_tbl.bookPrologue));
+                        document.Close();
+
+                    }
+                    Response.Clear();
+                    //Response.ContentType = "application/pdf";
+                    Response.ContentType = "application/octet-stream";
+                    Response.AddHeader("content-disposition", "attachment;filename="+pdf_tbl.bookTitle+".pdf");
+                    Response.Buffer = true;
+                    Response.Clear();
+                    var bytes = ms.ToArray();
+                    Response.OutputStream.Write(bytes, 0, bytes.Length);
+                    ModelState.Clear();
+                    Response.OutputStream.Flush();
+
+
+                }
+
+            
+            return View();
+        }
+
+
 
         [HttpPost]
         [MultipleButton(Name = "action", Argument = "editPreview")]
@@ -164,7 +221,14 @@ namespace WebApplication1.Controllers
                     using (var document = new Document(PageSize.A4, 50, 50, 15, 15))
                     {
                         PdfWriter.GetInstance(document, ms);
+                        Font titleFont = FontFactory.GetFont("Arial", 40);
+                        
+                        Paragraph title;
+                        title = new Paragraph(pdf_tbl.bookTitle, titleFont);
+                        title.Alignment = Element.ALIGN_CENTER;
+                        title.SpacingAfter = 20;
                         document.Open();
+                        document.Add(title);
                         document.Add(new Paragraph(pdf_tbl.bookPrologue));
                         document.Close();
 
@@ -172,7 +236,7 @@ namespace WebApplication1.Controllers
                     Response.Clear();
                     //Response.ContentType = "application/pdf";
                     Response.ContentType = "application/octet-stream";
-                    Response.AddHeader("content-disposition", "attachment;filename= Test.pdf");
+                    Response.AddHeader("content-disposition", "attachment;filename=" + pdf_tbl.bookTitle + ".pdf");
                     Response.Buffer = true;
                     Response.Clear();
                     var bytes = ms.ToArray();
