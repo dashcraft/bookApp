@@ -25,7 +25,7 @@ namespace WebApplication1.Controllers
         // GET: Pdf
         public ActionResult Index()
         {
-            return View(db.pdf_tbl.Where(d=>d.userName== System.Web.HttpContext.Current.User.Identity.Name).ToList());
+            return View(db.pdf_tbl.Where(d=>d.userName == System.Web.HttpContext.Current.User.Identity.Name).ToList());
             
         }
 
